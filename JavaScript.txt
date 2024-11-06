@@ -1,0 +1,103 @@
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.6.1/dist/js/tabulator.min.js"></script>
+<!-- Include Tabulator Library -->
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.6.1/dist/js/tabulator.min.js"></script>
+
+<!-- PDFMake for PDF export -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<!-- SheetJS (xlsx) for Excel export -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+
+
+
+<div id="example-table"></div>
+
+<!-- Div for Tabulator Table -->
+<div id="example-table"></div>
+
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.6.1/dist/js/tabulator.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+<script>
+  // Global variable for the Tabulator table
+  let table;
+
+  // Initialize Tabulator Table once the DOM is ready
+  document.addEventListener("DOMContentLoaded", createTable);
+
+  function createTable() {
+    google.script.run.withSuccessHandler((tableData) => {
+      console.log(tableData);
+
+      // Create a custom footer element with the count display and pagination controls
+      const footerElement = document.createElement("div");
+      footerElement.style.display = "flex";
+      footerElement.style.justifyContent = "space-between";
+      footerElement.style.alignItems = "center";
+
+      // Left side for entry count
+      const countDisplay = document.createElement("span");
+      countDisplay.id = "table-count";
+      countDisplay.innerText = "Showing 1 to X of Y entries";
+      footerElement.appendChild(countDisplay);
+
+      // Right side for pagination controls
+      const paginationControls = document.createElement("div");
+      paginationControls.id = "pagination-container"; // This will be used for pagination controls
+      footerElement.appendChild(paginationControls);
+
+      // Initialize Tabulator
+      table = new Tabulator("#example-table", {
+        data: tableData,
+        pagination: "local",
+        paginationSize: 100,
+        paginationSizeSelector: [150, 300, 400, true],
+        paginationElement: paginationControls, // Set pagination controls to the right side
+        movableColumns: true,
+        responsiveLayout: "collapse",
+        layout: "fitColumns",
+        columnDefaults: { tooltip: true },
+        footerElement: footerElement, // Set custom footer with count display and pagination controls
+        columns: [
+          {title: "No", formatter: "rownum", width: 50, hozAlign: "center"}, // Row number column
+          {title:"Year",field:"Year",headerFilter:true},
+          //{title:"SR No",field:"SR No",headerFilter:true},//
+          {title:"State Permanent",field:"State Permanent",headerFilter:true},
+          {title:"Aadhaar Name",field:"Aadhaar Name",headerFilter:true},
+          {title:"Father Name",field:"Father Name",headerFilter:true},
+          {title:"Date of Birth",field:"Date of Birth",headerFilter:true},
+          {title:"Mobile No",field:"Mobile No",headerFilter:true},
+          {title:"Date Of Registration(DD-MM-YYYY)",field:"Date Of Registration(DD-MM-YYYY)",headerFilter:true},
+          {title: "Current Address",field: "Current Address", headerFilter: true, formatterParams: { cssClass: "wrap-text" }},
+          {title:"Aadhaar Address",field:"Aadhaar Address",headerFilter:true},
+          {title:"NFS ID",field:"STATUS",headerFilter:true},
+          {title:"STATUS",field:"STATUS2",headerFilter:true},
+          {title:"HoF Details",field:"Details",headerFilter:true}
+        ],
+      });
+
+
+     // Update the count display based on filtered data
+      table.on("dataFiltered", function(filters, rows) {
+        let totalEntries = table.getDataCount();
+        let filteredEntries = rows.length;
+        document.getElementById("table-count").innerText = `Showing 1 to ${filteredEntries} of ${totalEntries} entries`;
+      });
+
+      // Initial update of the count display
+      let totalEntries = table.getDataCount();
+      document.getElementById("table-count").innerText = `Showing 1 to ${totalEntries} of ${totalEntries} entries`;
+    }).getData();
+  }
+    document.getElementById("csvBtn").addEventListener("click", () => table.download("csv", "ladlagk.csv"));
+    document.getElementById("excelBtn").addEventListener("click", () => table.download("xlsx", "ladlagk.xlsx"));
+    document.getElementById("printBtn").addEventListener("click", () => table.print());
+
+</script>
+
+<!-- HTML structure for the table -->
+<div id="example-table"></div>
